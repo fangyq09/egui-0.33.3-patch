@@ -800,21 +800,19 @@ impl TextEdit<'_> {
                     //    });
                     //});
 										//修改补丁
+										// 1. 拿到当前图层的原点 
 										let layer_origin = ui.painter().clip_rect().min;
+
+										// 2. 计算光标相对于层原点的绝对位置
 										let cursor_pos = layer_origin + primary_cursor_rect.min.to_vec2();
 
+										let y_offset = -5.0;
+
+										// 4. 这里的 final_x ，处理边界溢出
 										let final_x = if primary_cursor_rect.min.x > ui.min_rect().width() {
 											primary_cursor_rect.min.x 
 										} else {
 											cursor_pos.x
-										};
-
-										let is_multiline = ui.min_rect().height() > 35.0; 
-
-										let y_offset = if is_multiline {
-											-15.0 
-										} else {
-											20.0 
 										};
 
 										let final_rect = crate::Rect::from_min_size(
