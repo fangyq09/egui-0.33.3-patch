@@ -799,25 +799,16 @@ impl TextEdit<'_> {
                     //        cursor_rect: to_global * primary_cursor_rect,
                     //    });
                     //});
-										//修改补丁
-										// 1. 拿到当前图层的原点 
-										let layer_origin = ui.painter().clip_rect().min;
+										// ---  修正版 ---
 
-										// 2. 计算光标相对于层原点的绝对位置
-										let cursor_pos = layer_origin + primary_cursor_rect.min.to_vec2();
+										let to_global = ui.ctx().layer_transform_to_global(ui.layer_id()).unwrap_or_default();
+										let global_cursor = to_global * primary_cursor_rect;
 
-										let y_offset = -5.0;
-
-										// 4. 这里的 final_x ，处理边界溢出
-										let final_x = if primary_cursor_rect.min.x > ui.min_rect().width() {
-											primary_cursor_rect.min.x 
-										} else {
-											cursor_pos.x
-										};
+										let fixed_y_offset = 20.0; 
 
 										let final_rect = crate::Rect::from_min_size(
-											emath::pos2(final_x + 1.0, cursor_pos.y + y_offset), 
-											primary_cursor_rect.size()
+											emath::pos2(global_cursor.min.x + 1.0, global_cursor.min.y + fixed_y_offset), 
+											global_cursor.size()
 										);
 
 										ui.ctx().output_mut(|o| {
