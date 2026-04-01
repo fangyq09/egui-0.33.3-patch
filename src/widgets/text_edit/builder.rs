@@ -800,23 +800,31 @@ impl TextEdit<'_> {
                     //    });
                     //});
 										// ---  修正版 ---
+										// 1. 获取全局变换
+										let to_global = ui.ctx()
+											.layer_transform_to_global(ui.layer_id())
+											.unwrap_or_default();
 
-										let to_global = ui.ctx().layer_transform_to_global(ui.layer_id()).unwrap_or_default();
-										let global_cursor = to_global * primary_cursor_rect;
+										// 2. 变换原始光标矩形（这个版本的 X 是准的）
+									let global_cursor = to_global * primary_cursor_rect;
 
-										let fixed_y_offset = 20.0; 
+									// 3. 【核心修正】
+									let fixed_y_offset = 20.0; // 如果还是偏上一点，就把这个值调大
 
-										let final_rect = crate::Rect::from_min_size(
-											emath::pos2(global_cursor.min.x + 1.0, global_cursor.min.y + fixed_y_offset), 
-											global_cursor.size()
-										);
+									let final_rect = crate::Rect::from_min_size(
+										emath::pos2(
+											global_cursor.min.x + 1.0, 
+											global_cursor.min.y + fixed_y_offset
+										), 
+										global_cursor.size()
+									);
 
-										ui.ctx().output_mut(|o| {
-											o.ime = Some(crate::output::IMEOutput {
-												rect: final_rect,
-												cursor_rect: final_rect,
-											});
+									ui.ctx().output_mut(|o| {
+										o.ime = Some(crate::output::IMEOutput {
+											rect: final_rect,
+											cursor_rect: final_rect,
 										});
+									});
 								}
 						}
         }
